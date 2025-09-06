@@ -117,14 +117,12 @@ const HomePage = () => {
                 x: (imageDimensions.height - v.y) * scaleX,
                 y: v.x * scaleY
               }))
-              console.log(`"${pii.text}" - Rotated then scaled vertices:`, transformedVertices)
             } else {
               // just scale directly
               transformedVertices = pii.vertices.map(v => ({
                 x: v.x * scaleX,
                 y: v.y * scaleY
               }))
-              console.log(`"${pii.text}" - Scaled vertices:`, transformedVertices)
             }
 
             // draw polygon using the transformed vertices

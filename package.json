@@ -1,45 +1,39 @@
 {
-  "name": "redact-that-web",
-  "version": "0.1.0",
+  "name": "redact-that",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "check-types": "turbo run check-types",
+    "prepare": "husky"
   },
-  "dependencies": {
-    "@ai-sdk/openai": "^1.3.22",
-    "@fortawesome/fontawesome-svg-core": "^6.7.2",
-    "@fortawesome/pro-regular-svg-icons": "^6.7.2",
-    "@fortawesome/pro-solid-svg-icons": "^6.7.2",
-    "@fortawesome/react-fontawesome": "^0.2.2",
-    "@google-cloud/vision": "^5.2.0",
-    "@radix-ui/react-checkbox": "^1.3.2",
-    "@radix-ui/react-label": "^2.1.7",
-    "@radix-ui/react-slot": "^1.2.3",
-    "ai": "^4.3.16",
-    "class-variance-authority": "^0.7.1",
-    "clsx": "^2.1.1",
-    "fastest-levenshtein": "^1.0.16",
-    "image-size": "^2.0.2",
-    "lucide-react": "^0.525.0",
-    "next": "15.3.4",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "tailwind-merge": "^3.3.1",
-    "zod": "^3.25.67"
+  "lint-staged": {
+    "apps/web/**/*.{ts,tsx}": [
+      "cd apps/web && tsc --noEmit",
+      "cd apps/web && next lint --fix --file"
+    ],
+    "**/*.+(js|jsx|json|ts|tsx|html|md)": [
+      "prettier --ignore-path .gitignore --write",
+      "jest --findRelatedTests --passWithNoTests"
+    ]
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3",
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "15.3.4",
-    "tailwindcss": "^4",
-    "tw-animate-css": "^1.3.4",
-    "typescript": "^5"
+    "husky": "^9.0.11",
+    "lint-staged": "^16.0.0",
+    "prettier": "^3.6.2",
+    "turbo": "^2.5.6",
+    "typescript": "5.8.3"
+  },
+  "packageManager": "pnpm@10.6.1",
+  "engines": {
+    "node": ">=18"
+  },
+  "resolutions": {
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "react-native-renderer": "19.0.0",
+    "@types/react": "^19.0.0"
   }
 }

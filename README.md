@@ -1,6 +1,6 @@
 # RedactThat
 
-A Next.js application that automatically detects and redacts personally identifiable information (PII) from images using Google Vision API for OCR and OpenAI GPT-4o for PII detection.
+A monorepo containing a Next.js application that automatically detects and redacts personally identifiable information (PII) from images using Google Vision API for OCR and OpenAI GPT-4o for PII detection.
 
 ## Features
 
@@ -21,7 +21,7 @@ You'll need the following API keys and credentials:
 
 ### Environment Variables
 
-Create a `.env.local` file in the root directory with the following variables:
+Create a `.env.local` file in the `apps/web` directory with the following variables:
 
 ```bash
 # OpenAI API Key for GPT-4o
@@ -45,6 +45,15 @@ pnpm dev
 
 3. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+## Project Structure
+
+This is a Turborepo monorepo containing:
+
+- `apps/web/` - The main Next.js application
+- `packages/` - Shared packages (if any)
+
+The development commands are managed by Turborepo and can be run from the root directory.
+
 ## How it Works
 
 1. **Image Upload**: Users can drag & drop or browse for PNG/JPG images
@@ -56,6 +65,7 @@ pnpm dev
 
 ## Tech Stack
 
+- **Monorepo**: Turborepo
 - **Framework**: Next.js 15 with App Router
 - **Styling**: Tailwind CSS v4
 - **UI Components**: shadcn/ui

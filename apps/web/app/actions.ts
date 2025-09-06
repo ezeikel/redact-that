@@ -7,6 +7,21 @@ import vision from "@google-cloud/vision"
 import sizeOf from 'image-size'
 import { distance } from 'fastest-levenshtein'
 
+// Type definitions for Google Vision API
+type Vertex = {
+  x?: number | null
+  y?: number | null
+}
+
+type BoundingBox = {
+  vertices?: Vertex[] | null
+}
+
+type WordInfo = {
+  text: string
+  boundingBox?: BoundingBox | null
+}
+
 // define the schema for the PII data we expect from the AI model
 const PiiSchema = z.object({
   pii: z
@@ -105,7 +120,7 @@ export const processImageWithVisionApi = async (imageBase64: string) => {
     
 
     // extract words and their bounding boxes from the document structure
-    const words: { text: string; boundingBox: any }[] = []
+    const words: WordInfo[] = []
     if (annotation.pages) {
       for (const page of annotation.pages) {
         for (const block of page.blocks ?? []) {
@@ -239,7 +254,7 @@ const createSearchVariants = (piiText: string): string[][] => {
 
 // helper function to create a PII match object
 const createPiiMatch = (
-  wordSlice: { text: string; boundingBox: any }[],
+  wordSlice: WordInfo[],
   id: number,
   pii: { text: string; label: string },
   confidence: number,
@@ -252,8 +267,8 @@ const createPiiMatch = (
   if (validVertices.length === 0) return null
   
   // calculate proper bounding box that handles rotated text
-  const xCoords = validVertices.map((v) => v.x)
-  const yCoords = validVertices.map((v) => v.y)
+  const xCoords = validVertices.map((v) => v.x!).filter(x => x !== null && x !== undefined)
+  const yCoords = validVertices.map((v) => v.y!).filter(y => y !== null && y !== undefined)
   
   const x0 = Math.min(...xCoords)
   const y0 = Math.min(...yCoords)
@@ -277,9 +292,9 @@ const createPiiMatch = (
 }
 
 // flexible matching for multi-word PII that might be spread across lines
-const findFlexibleMatches = (searchVariants: string[][], wordMap: { text: string; boundingBox: any }[], foundPositions: Set<number>) => {
+const findFlexibleMatches = (searchVariants: string[][], wordMap: WordInfo[], foundPositions: Set<number>) => {
   const matches: Array<{
-    words: { text: string; boundingBox: any }[],
+    words: WordInfo[],
     confidence: number,
     matchedWords: string[],
     positions: number[]
@@ -348,7 +363,7 @@ const findFlexibleMatches = (searchVariants: string[][], wordMap: { text: string
 }
 
 // fuzzy matching function for OCR errors
-const fuzzyMatchPII = (piiText: string, words: { text: string; boundingBox: any }[], threshold = 0.8): Array<{position: number, confidence: number, matchedWords: number}> => {
+const fuzzyMatchPII = (piiText: string, words: WordInfo[], threshold = 0.8): Array<{position: number, confidence: number, matchedWords: number}> => {
   const matches: Array<{position: number, confidence: number, matchedWords: number}> = []
   const normalizedPii = piiText.replace(/[^a-zA-Z0-9]/g, "").toLowerCase()
   
@@ -388,14 +403,14 @@ const fuzzyMatchPII = (piiText: string, words: { text: string; boundingBox: any 
 // helper function to map PII phrases to their bounding boxes
 const mapPiiToBbox = (
   piiList: { text: string; label: string }[],
-  words: { text: string; boundingBox: any }[],
+  words: WordInfo[],
 ) => {
   const piiData: {
     id: number
     label: string
     text: string
     bbox: [number, number, number, number]
-    vertices?: any[]
+    vertices?: Vertex[]
     redacted: boolean
     confidence?: number
     matchType?: string

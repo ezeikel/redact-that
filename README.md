@@ -1,36 +1,76 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# RedactThat
+
+A Next.js application that automatically detects and redacts personally identifiable information (PII) from images using Google Vision API for OCR and OpenAI GPT-4o for PII detection.
+
+## Features
+
+- Drag & drop image upload
+- Automatic PII detection using AI
+- Interactive redaction controls
+- Download redacted images
+- Modern, responsive UI with Font Awesome Pro icons
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+You'll need the following API keys and credentials:
+
+1. **OpenAI API Key** - For GPT-4o PII detection
+2. **Google Cloud Vision API** - For OCR text extraction
+
+### Environment Variables
+
+Create a `.env.local` file in the root directory with the following variables:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# OpenAI API Key for GPT-4o
+OPENAI_API_KEY=your_openai_api_key_here
+
+# Google Cloud Vision API credentials (base64 encoded service account JSON)
+GOOGLE_APPLICATION_CREDENTIALS_BASE64=your_base64_encoded_google_credentials_here
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Installation
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Install dependencies:
+```bash
+pnpm install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2. Run the development server:
+```bash
+pnpm dev
+```
+
+3. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+## How it Works
+
+1. **Image Upload**: Users can drag & drop or browse for PNG/JPG images
+2. **OCR Processing**: Google Vision API extracts text and bounding boxes from the image
+3. **PII Detection**: OpenAI GPT-4o analyzes the extracted text to identify sensitive information
+4. **Redaction Mapping**: PII text is mapped back to the original bounding boxes
+5. **Interactive Controls**: Users can toggle redactions on/off for each detected PII
+6. **Download**: Users can download the redacted image
+
+## Tech Stack
+
+- **Framework**: Next.js 15 with App Router
+- **Styling**: Tailwind CSS v4
+- **UI Components**: shadcn/ui
+- **Icons**: Font Awesome Pro
+- **AI**: OpenAI GPT-4o via Vercel AI SDK
+- **OCR**: Google Cloud Vision API
+- **Type Safety**: TypeScript
+- **Package Manager**: pnpm
 
 ## Learn More
 
-To learn more about Next.js, take a look at the following resources:
+To learn more about the technologies used:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Vercel AI SDK](https://sdk.vercel.ai/docs)
+- [Google Cloud Vision API](https://cloud.google.com/vision/docs)
+- [OpenAI API](https://platform.openai.com/docs)
+- [shadcn/ui](https://ui.shadcn.com/)

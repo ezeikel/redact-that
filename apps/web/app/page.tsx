@@ -9,6 +9,7 @@ import {
   faFileImage,
   faBrain
 } from "@fortawesome/pro-solid-svg-icons"
+import { track } from '@vercel/analytics'
 import { processImageWithVisionApi } from "./actions"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -146,6 +147,11 @@ const HomePage = () => {
     const imageUrl = URL.createObjectURL(file)
     setImageSrc(imageUrl)
 
+    track('image_uploaded', {
+      file_type: file.type,
+      file_size: file.size,
+    })
+
     const reader = new FileReader()
     reader.readAsDataURL(file)
     reader.onload = async () => {
@@ -171,8 +177,15 @@ const HomePage = () => {
 
       if (result.piiData && result.piiData.length > 0) {
         setPiiData(result.piiData)
+
+        track('pii_detected', {
+          pii_count: result.piiData.length,
+          pii_types: result.piiData.map(p => p.label).join(','),
+        })
       } else {
         alert("No sensitive information was found in the document.")
+
+        track('no_pii_detected')
       }
       setLoadingStep("done")
     }
@@ -225,12 +238,37 @@ const HomePage = () => {
   }
 
   const toggleRedaction = (id: number) => {
-    setPiiData((prev) => prev.map((pii) => (pii.id === id ? { ...pii, redacted: !pii.redacted } : pii)))
+    setPiiData((prev) => {
+      const updated = prev.map((pii) => {
+        if (pii.id === id) {
+          const newRedacted = !pii.redacted
+
+          track('redaction_toggled', {
+            pii_type: pii.label,
+            action: newRedacted ? 'redact' : 'unredact',
+          })
+
+          return { ...pii, redacted: newRedacted }
+        }
+        return pii
+      })
+      return updated
+    })
   }
 
   const downloadImage = () => {
     const canvas = canvasRef.current
     if (!canvas) return
+
+    const redactedCount = piiData.filter(pii => pii.redacted).length
+    const totalPiiCount = piiData.length
+
+    track('image_downloaded', {
+      total_pii_found: totalPiiCount,
+      redacted_count: redactedCount,
+      redaction_rate: totalPiiCount > 0 ? (redactedCount / totalPiiCount) : 0,
+    })
+
     const link = document.createElement("a")
     link.download = "redacted-image.png"
     link.href = canvas.toDataURL("image/png")
